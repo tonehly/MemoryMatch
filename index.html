@@ -147,12 +147,21 @@
     <div class="ground"></div>
   </div>
 
+  <!-- ===== COUNTDOWN OVERLAY ===== -->
+  <div id="overlay-countdown" class="overlay-countdown hidden">
+    <div class="countdown-box">
+      <p class="countdown-label">Remember the cards!</p>
+      <div class="countdown-num" id="countdown-num">3</div>
+    </div>
+  </div>
+
   <!-- ===== LEVEL COMPLETE OVERLAY ===== -->
   <div id="overlay-levelup" class="overlay-levelup hidden">
     <div class="levelup-box">
       <div class="stars">⭐⭐⭐</div>
       <h2>Level Complete!</h2>
       <p id="levelup-msg">Get ready for Level 2!</p>
+      <p id="levelup-time" class="levelup-time"></p>
       <button class="btn-start btn-small" id="btn-next-level"><span>Next Level</span></button>
     </div>
   </div>

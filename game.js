@@ -63,8 +63,11 @@
   const hudTime        = document.getElementById('hud-time');
   const hudLives       = document.getElementById('hud-lives');
   const gameBoard      = document.getElementById('game-board');
-  const overlayLevelup = document.getElementById('overlay-levelup');
-  const levelupMsg     = document.getElementById('levelup-msg');
+  const overlayLevelup   = document.getElementById('overlay-levelup');
+  const levelupMsg       = document.getElementById('levelup-msg');
+  const levelupTime      = document.getElementById('levelup-time');
+  const overlayCountdown = document.getElementById('overlay-countdown');
+  const countdownNum     = document.getElementById('countdown-num');
   const gameoverTitle  = document.getElementById('gameover-title');
   const gameoverSub    = document.getElementById('gameover-sub');
 
@@ -213,9 +216,8 @@
   });
 
   btnPlayAgain.addEventListener('click', () => {
-    currentLevel = 1;
-    showScreen(screenGame);
-    startLevel(1);
+    showScreen(screenTitle);
+    refreshConfigCards();
   });
 
   btnNextLevel.addEventListener('click', () => {
@@ -227,7 +229,7 @@
   function startLevel(level) {
     stopTimer();
     flippedCards  = [];
-    lockBoard     = false;
+    lockBoard     = true;   // locked during reveal phase
     matchedPairs  = 0;
     lives         = LIVES_PER_LEVEL;
 
@@ -239,7 +241,41 @@
     updateTimerDisplay();
     renderLives();
     buildBoard(totalCards);
-    startTimer();
+
+    // Wait for layout (fitBoard rAF) to settle, then reveal cards
+    setTimeout(() => {
+      startRevealPhase(level, () => {
+        lockBoard = false;
+        startTimer();
+      });
+    }, 120);
+  }
+
+  function startRevealPhase(level, callback) {
+    const revealSeconds = level >= 10 ? 5 : 3;
+
+    gameBoard.querySelectorAll('.game-card').forEach(c => c.classList.add('flipped'));
+    overlayCountdown.classList.remove('hidden');
+
+    let remaining = revealSeconds;
+
+    function tick() {
+      if (remaining === 0) {
+        overlayCountdown.classList.add('hidden');
+        gameBoard.querySelectorAll('.game-card').forEach(c => c.classList.remove('flipped'));
+        callback();
+        return;
+      }
+      countdownNum.textContent = remaining;
+      // Re-trigger animation each second
+      countdownNum.style.animation = 'none';
+      void countdownNum.offsetWidth;
+      countdownNum.style.animation = 'countPulse 1s ease forwards';
+      remaining--;
+      setTimeout(tick, 1000);
+    }
+
+    tick();
   }
 
   /* =====================================================
@@ -291,21 +327,29 @@
   function fitBoard() {
     const wrap = document.querySelector('.game-board-wrap');
     if (!wrap) return;
-    const wrapRect = wrap.getBoundingClientRect();
-    const available = {
-      w: wrapRect.width  - 28,
-      h: wrapRect.height - 28,
-    };
+    const totalCards = gameBoard.children.length;
+    if (totalCards === 0) return;
 
-    const cols = parseInt(gameBoard.style.gridTemplateColumns.match(/repeat\((\d+)/)?.[1] || '3');
-    const rows = Math.ceil(gameBoard.children.length / cols);
-    const gapPx = parseFloat(getComputedStyle(gameBoard).gap) || 12;
+    const wrapRect  = wrap.getBoundingClientRect();
+    const wrapStyle = getComputedStyle(wrap);
+    const availW    = wrapRect.width  - parseFloat(wrapStyle.paddingLeft) - parseFloat(wrapStyle.paddingRight);
+    const availH    = wrapRect.height - parseFloat(wrapStyle.paddingTop)  - parseFloat(wrapStyle.paddingBottom);
+    const gapPx     = parseFloat(getComputedStyle(gameBoard).gap) || 12;
 
-    const maxCardW = (available.w - gapPx * (cols - 1)) / cols;
-    const maxCardH = (available.h - gapPx * (rows - 1)) / rows;
-    const cardSize = Math.floor(Math.min(maxCardW, maxCardH));
+    // Try every possible column count; keep the one that yields the largest card that still fits
+    let bestSize = 0;
+    let bestCols = 1;
+    for (let c = 1; c <= totalCards; c++) {
+      const r     = Math.ceil(totalCards / c);
+      const cardW = (availW - gapPx * (c - 1)) / c;
+      const cardH = (availH - gapPx * (r - 1)) / r;
+      const size  = Math.min(cardW, cardH);
+      if (size > bestSize) { bestSize = size; bestCols = c; }
+    }
 
-    gameBoard.style.width = `${cardSize * cols + gapPx * (cols - 1)}px`;
+    const cardSize = Math.floor(bestSize);
+    gameBoard.style.gridTemplateColumns = `repeat(${bestCols}, 1fr)`;
+    gameBoard.style.width = `${cardSize * bestCols + gapPx * (bestCols - 1)}px`;
     gameBoard.querySelectorAll('.game-card').forEach(c => {
       c.style.width  = `${cardSize}px`;
       c.style.height = `${cardSize}px`;
@@ -455,7 +499,12 @@
   function onLevelComplete() {
     stopTimer();
     setTimeout(() => {
+      const starsDiv = overlayLevelup.querySelector('.stars');
+      starsDiv.textContent = '⭐'.repeat(Math.max(1, lives));
       levelupMsg.textContent = `Get ready for Level ${currentLevel + 1}!`;
+      const m = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+      const s = String(timerSeconds % 60).padStart(2, '0');
+      levelupTime.textContent = `Time: ${m}:${s}`;
       overlayLevelup.classList.remove('hidden');
     }, NEXT_LEVEL_DELAY);
   }

@@ -588,6 +588,56 @@ html, body {
 }
 
 /* ===========================
+   Countdown Overlay
+   =========================== */
+.overlay-countdown {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.overlay-countdown.hidden { display: none; }
+
+.countdown-box {
+  background: rgba(0, 0, 0, 0.62);
+  border-radius: 24px;
+  padding: clamp(14px, 3vw, 28px) clamp(28px, 6vw, 56px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border: 3px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.countdown-label {
+  font-family: var(--font-main);
+  font-size: clamp(14px, 3vw, 22px);
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.countdown-num {
+  font-family: var(--font-main);
+  font-size: clamp(64px, 16vw, 110px);
+  color: #fff;
+  font-weight: 900;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  line-height: 1;
+  animation: countPulse 1s ease forwards;
+}
+
+@keyframes countPulse {
+  0%   { transform: scale(1.4); opacity: 0; }
+  15%  { transform: scale(1);   opacity: 1; }
+  75%  { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0; }
+}
+
+/* ===========================
    Level Up Overlay
    =========================== */
 .overlay-levelup {
@@ -630,6 +680,11 @@ html, body {
   font-family: var(--font-main);
   font-size: clamp(16px, 3.5vw, 26px);
   color: #555;
+}
+.levelup-time {
+  font-size: clamp(14px, 3vw, 22px);
+  color: #888;
+  margin-top: -4px;
 }
 
 /* ===========================
