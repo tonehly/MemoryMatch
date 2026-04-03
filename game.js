@@ -330,10 +330,11 @@
     const totalCards = gameBoard.children.length;
     if (totalCards === 0) return;
 
-    const wrapRect  = wrap.getBoundingClientRect();
     const wrapStyle = getComputedStyle(wrap);
-    const availW    = wrapRect.width  - parseFloat(wrapStyle.paddingLeft) - parseFloat(wrapStyle.paddingRight);
-    const availH    = wrapRect.height - parseFloat(wrapStyle.paddingTop)  - parseFloat(wrapStyle.paddingBottom);
+    const hudEl     = document.querySelector('.game-hud');
+    const hudH      = hudEl ? hudEl.getBoundingClientRect().height : 0;
+    const availW    = window.innerWidth  - parseFloat(wrapStyle.paddingLeft) - parseFloat(wrapStyle.paddingRight);
+    const availH    = window.innerHeight - hudH - parseFloat(wrapStyle.paddingTop) - parseFloat(wrapStyle.paddingBottom);
     const gapPx     = parseFloat(getComputedStyle(gameBoard).gap) || 12;
 
     // Try every possible column count; keep the one that yields the largest card that still fits
@@ -555,6 +556,37 @@
     }
     return array;
   }
+
+  /* =====================================================
+     Fullscreen Toggle
+     ===================================================== */
+  const btnFullscreen  = document.getElementById('btn-fullscreen');
+  const iconExpand     = btnFullscreen.querySelector('.icon-expand');
+  const iconCompress   = btnFullscreen.querySelector('.icon-compress');
+
+  function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
+  function updateFullscreenIcon() {
+    const fs = isFullscreen();
+    iconExpand.style.display   = fs ? 'none'  : 'block';
+    iconCompress.style.display = fs ? 'block' : 'none';
+  }
+
+  btnFullscreen.addEventListener('click', () => {
+    if (isFullscreen()) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    } else {
+      const el = document.documentElement;
+      if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }
+  });
+
+  document.addEventListener('fullscreenchange', updateFullscreenIcon);
+  document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
 
   /* =====================================================
      Init
