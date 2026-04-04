@@ -374,6 +374,11 @@ html, body {
   display: block;
 }
 
+/* Mirror the live viewfinder so it feels like a selfie mirror */
+#camera-video {
+  transform: scaleX(-1);
+}
+
 .camera-placeholder {
   position: absolute;
   inset: 0;
@@ -731,6 +736,32 @@ html, body {
   text-shadow: 0 2px 6px rgba(0,0,0,0.5);
 }
 
+/* Continue button — orange, distinct from the green btn-start */
+.btn-continue {
+  background: linear-gradient(180deg, #f5883a 0%, #d86010 100%);
+  border: none;
+  border-radius: 50px;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #943800, 0 10px 20px rgba(0,0,0,0.3);
+  transition: transform 0.1s, box-shadow 0.1s;
+  min-width: clamp(160px, 35vw, 260px);
+}
+.btn-continue span {
+  display: block;
+  padding: clamp(14px, 3vw, 22px) clamp(40px, 8vw, 70px);
+  font-family: var(--font-main);
+  font-size: clamp(20px, 4.5vw, 36px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 3px 0 rgba(0,0,0,0.3);
+  letter-spacing: 1px;
+}
+.btn-continue:active {
+  transform: translateY(5px);
+  box-shadow: 0 3px 0 #943800, 0 5px 10px rgba(0,0,0,0.3);
+}
+
 /* ===========================
    Particle (star burst on match)
    =========================== */
@@ -749,6 +780,61 @@ html, body {
 /* ===========================
    Responsive tweaks
    =========================== */
+
+/* Title screen layout groups — transparent to flex by default so
+   the column layout is unchanged. In landscape they become real boxes. */
+.title-left-group,
+.title-right-group {
+  display: contents;
+}
+
+/* Landscape: switch title screen to a two-column layout so all 6 config
+   cards and the Start button are always visible without scrolling.
+   Covers all phones and most tablets in landscape orientation. */
+@media (orientation: landscape) and (max-height: 700px) {
+  #screen-title .title-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 0 16px 44px;
+  }
+
+  .title-left-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .title-right-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .title-hint {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  #screen-title .card-configurator {
+    width: min(280px, 42vw);
+    gap: 6px;
+  }
+
+  #screen-title .btn-start {
+    min-width: 0;
+  }
+
+  #screen-title .btn-start span {
+    font-size: clamp(16px, 3vw, 22px);
+    padding: 10px 28px;
+  }
+}
+
 @media (orientation: landscape) and (max-height: 520px) {
   .game-hud { padding: 4px 10px; }
   .hud-sign, .hud-timer { font-size: 14px; padding: 4px 10px; }

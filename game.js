@@ -47,6 +47,7 @@
 
   const btnStart       = document.getElementById('btn-start');
   const btnPlayAgain   = document.getElementById('btn-play-again');
+  const btnContinue    = document.getElementById('btn-continue');
   const btnNextLevel   = document.getElementById('btn-next-level');
 
   const cameraVideo    = document.getElementById('camera-video');
@@ -218,6 +219,13 @@
   btnPlayAgain.addEventListener('click', () => {
     showScreen(screenTitle);
     refreshConfigCards();
+  });
+
+  btnContinue.addEventListener('click', () => {
+    lives = LIVES_PER_LEVEL;
+    renderLives();
+    showScreen(screenGame);
+    startTimer();
   });
 
   btnNextLevel.addEventListener('click', () => {
