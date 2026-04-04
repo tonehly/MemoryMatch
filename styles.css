@@ -336,12 +336,38 @@ html, body {
   border-radius: 24px;
   padding: clamp(16px, 3vw, 28px);
   width: min(420px, 92vw);
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
   border: 5px solid #a07030;
   box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+  overflow-y: auto;
+}
+/* Ensure modal dialog fits and buttons are always visible in landscape on small screens */
+@media (orientation: landscape) and (max-height: 520px), (orientation: landscape) and (max-width: 700px) {
+  .modal-overlay {
+    align-items: flex-start;
+  }
+  .modal-box {
+    margin: 12px 0;
+    max-height: 96vh;
+    width: min(420px, 98vw);
+  }
+  .camera-area {
+    max-height: 38vh;
+    aspect-ratio: unset;
+    height: 38vh;
+  }
+  .modal-actions {
+    position: sticky;
+    bottom: 0;
+    background: #f5e9c8ee;
+    z-index: 2;
+    padding-bottom: 8px;
+    margin-bottom: -8px;
+  }
 }
 
 .modal-title {
