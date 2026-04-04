@@ -174,10 +174,16 @@
     const offX  = (video.videoWidth  - size) / 2;
     const offY  = (video.videoHeight - size) / 2;
 
+
     cameraCanvas.width  = size;
     cameraCanvas.height = size;
     const ctx = cameraCanvas.getContext('2d');
+    // Mirror horizontally so the photo matches the live preview
+    ctx.save();
+    ctx.translate(size, 0);
+    ctx.scale(-1, 1);
     ctx.drawImage(video, offX, offY, size, size, 0, 0, size, size);
+    ctx.restore();
 
     capturedDataUrl = cameraCanvas.toDataURL('image/jpeg', 0.85);
 
